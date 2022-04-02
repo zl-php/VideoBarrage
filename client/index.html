@@ -28,8 +28,8 @@
             fontsize: 0
         }];
         var itemsColor = [
-            '#FFA54F', '#FF4040', '#EE1289', '#8E8E38', '#3A5FCD',
-            '#00EE76', '#388E8E', '#76EEC6', '#87CEFF', '#7FFFD4'
+            'black', 'maroon', 'red', 'purple', 'fuchsia', 'green', 'white',
+            'lime', 'olive', 'yellow', 'navy', 'blue', 'teal', 'aqua', 'gray'
         ];
 
         var eleCanves = document.getElementById('canvasBarrage');
@@ -81,8 +81,10 @@
             barrage.add({
                 value: msg,
                 time: eleVideo.currentTime,
-                speed: 5,
-                color: itemsColor[Math.floor(Math.random() * itemsColor.length)]
+                speed: 3,
+                color: itemsColor[Math.floor(Math.random() * itemsColor.length)],
+                range: [0,0.5],
+                fontSize: 22
             });
         });
 
