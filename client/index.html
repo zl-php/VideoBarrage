@@ -9,8 +9,8 @@
 <canvas id="canvasBarrage" class="canvas-barrage"></canvas>
 <video id="videoBarrage" width="960" height="540" src="./video/demo.mp4" autoplay="autoplay" controls="controls" ></video>
 <p>
-    <input class="ui-input" id="msg" name="value" value="" type="text" placeholder="请输入您的弹幕信息" required>
-    <input class="ui-button" id="sendBtn" value="点击发送" type="button">
+    <input type="text" class="ui-input" id="msg" name="msg" value=""  placeholder="请输入您的弹幕信息" />
+    <input type="button" class="ui-button" id="sendBtn" value="点击发送" />
 </p>
 </body>
 <script src="./js/canvasBarrage.js"></script>
@@ -93,10 +93,12 @@
         // 获取用户输入数据
         var sendBtn = document.getElementById('sendBtn');
         sendBtn.onclick = function () {
-            var input = document.getElementById('msg').value;
+            var input = document.getElementById('msg');
 
-            if(input==''){
+            if(input.value==''){
                 alert('请输入弹幕');
+                input.focus();
+                return false;
             }
 
             // 放松弹幕
@@ -109,7 +111,7 @@
             // 向服务端发送事件，包含人和弹幕消息的对象
             socket.emit('message', obj);
 
-            document.getElementById('msg').value = '';
+            input.value = '';
         };
     }else {
         alert('您的浏览器不支持 WebSocket');
