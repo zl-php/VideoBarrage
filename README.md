@@ -1,0 +1,2 @@
+# VideoBarrage
+以Nodejs为服务端并基于HTML5 canvas和mp4视频实现的真实交互弹幕
