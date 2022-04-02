@@ -1,0 +1,4 @@
+body{width:960px;margin:0 auto}
+.canvas-barrage{position:absolute;width:960px;height:540px;pointer-events:none;z-index:1}
+.ui-input{width:856px;height:20px;line-height:20px;border:1px solid #d0d0d5;border-radius:4px;padding:9px 8px}
+.ui-button{display:inline-block;background-color:#2486ff;line-height:28px;text-align:center;border-radius:4px;color:#fff;font-size:14px}

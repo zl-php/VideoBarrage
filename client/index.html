@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>nodejs 视频弹幕</title>
+    <link rel="stylesheet" href="./css/canvasBarrage.css">
+</head>
+<body>
+<canvas id="canvasBarrage" class="canvas-barrage"></canvas>
+<video id="videoBarrage" width="960" height="540" src="./video/demo.mp4" autoplay="autoplay" controls="controls" ></video>
+<p>
+    <input class="ui-input" id="msg" name="value" value="" type="text" placeholder="请输入您的弹幕信息" required>
+    <input class="ui-button" id="sendBtn" value="点击发送" type="button">
+</p>
+</body>
+<script src="./js/canvasBarrage.js"></script>
+<script src="./js/socket.io.js"></script>
+<script>
+    if ("WebSocket" in window) {
+
+        var userid, username;
+
+        // 构造弹幕数据
+        var dataBarrage = [{
+            value: '',
+            time: 0,  // 单位为秒
+            speed: 0, // 非滚动
+            fontsize: 0
+        }];
+        var itemsColor = [
+            '#FFA54F', '#FF4040', '#EE1289', '#8E8E38', '#3A5FCD',
+            '#00EE76', '#388E8E', '#76EEC6', '#87CEFF', '#7FFFD4'
+        ];
+
+        var eleCanves = document.getElementById('canvasBarrage');
+        var eleVideo = document.getElementById('videoBarrage');
+
+        var barrage = new CanvasBarrage(eleCanves, eleVideo, {
+            data: dataBarrage
+        });
+
+        // 链接远程ws服务器
+        var socket = io.connect('ws://127.0.0.1:3000', {transports: ['websocket', 'polling', 'flashsocket']});
+
+        socket.on("connect", () => {
+
+            userid = socket.id;
+            username = '用户' + Math.floor(Math.random()*1000);
+
+            // 发送一个名为 login 的事件，作为用户登录
+            socket.emit('login', {'userid' : userid,'username' : username});
+        });
+
+        socket.on("connect_error", error => {
+            console.log(`socket connect error: ${error}`)
+        });
+
+        // 监听用户登录事件
+        socket.on('login', obj => {
+            console.log('当前用户在线状态：' + JSON.stringify(obj))
+        });
+
+        // 监听用户退出事件
+        socket.on('logout', obj => {
+            console.log('用户退出后的在线状态：' + JSON.stringify(obj))
+        });
+
+        // 监听用户消息事件
+        socket.on('message', obj => {
+
+            // 判断是否是自己发的消息
+            var msg;
+            var isMe = (obj.userid === userid);
+            if (isMe) {
+                msg = '我：' +  obj.content;
+            } else {
+                msg = obj.username + '：' + obj.content;
+            }
+
+            // 动态生成弹幕
+            barrage.add({
+                value: msg,
+                time: eleVideo.currentTime,
+                speed: 5,
+                color: itemsColor[Math.floor(Math.random() * itemsColor.length)]
+            });
+        });
+
+        socket.on("disconnect", reason => {
+            console.log(`socket disconnect: ${reason}`)
+        });
+
+        // 获取用户输入数据
+        var sendBtn = document.getElementById('sendBtn');
+        sendBtn.onclick = function () {
+            var input = document.getElementById('msg').value;
+
+            if(input==''){
+                alert('请输入弹幕');
+            }
+
+            // 放松弹幕
+            var content = document.getElementById('msg').value;
+            var obj = {
+                userid: userid,
+                username: username,
+                content: content
+            };
+            // 向服务端发送事件，包含人和弹幕消息的对象
+            socket.emit('message', obj);
+
+            document.getElementById('msg').value = '';
+        };
+    }else {
+        alert('您的浏览器不支持 WebSocket');
+    }
+</script>
+</html>
